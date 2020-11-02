@@ -3,7 +3,7 @@
 A code formatter for vyper.
 
 ## Usage
-Use pre-commit hooks: put this in your repo's `.pre-commit-config.yaml`
+Use pre-commit hooks: put this in your repo's `.pre-commit-config.yaml` and add Python's `pre-commit` to your test requirements.
 ```
 repos:
 -   repo: https://github.com/spinoch/blackadder
@@ -13,7 +13,12 @@ repos:
       language_version: python3
 ```
 
-To run it manually, run the following in you terminal:
+
+To run it manually, first install the master branch using pip:
+```
+pip install git+https://github.com/spinoch/blackadder.git
+```
+Then run the following in you terminal:
 ```
 blackadder --fast --include '\.vy$' .
 ```
