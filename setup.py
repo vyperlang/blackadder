@@ -37,7 +37,7 @@ setup(
     install_requires=["black>=20.8b1", "vyper>=0.2.7"],
     test_suite="tests",
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 3 - Alpha",
         "Environment :: Console",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
