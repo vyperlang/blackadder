@@ -1,6 +1,7 @@
 import blackadder
 import black
 
+
 def test_vyper():
     blackadder.reformat_one(
         black.Path("data/Vault.vy"),

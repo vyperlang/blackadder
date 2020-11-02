@@ -34,10 +34,7 @@ setup(
     packages=["blackadder"],
     package_dir={"": "src"},
     python_requires=">=3.6",
-    install_requires=[
-        "black>=20.8b1",
-        "vyper>=0.2.7"
-    ],
+    install_requires=["black>=20.8b1", "vyper>=0.2.7"],
     test_suite="tests",
     classifiers=[
         "Development Status :: 4 - Beta",

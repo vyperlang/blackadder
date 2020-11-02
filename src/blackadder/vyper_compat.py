@@ -1,8 +1,9 @@
 import re
-from vyper.ast.pre_parser import VYPER_CLASS_TYPES, VYPER_EXPRESSION_TYPES, pre_parse
+from vyper.ast.pre_parser import VYPER_CLASS_TYPES, VYPER_EXPRESSION_TYPES
 
 # FIXME: `\s` here should be `[^\S\r\n]`
-MIDDLE_WHITESPACE = r"\s+(?:\\\s*\r?\n\s*)?"  # Whitespace plus optional single `\` followed by a line break
+# Whitespace plus optional single `\` followed by a line break
+MIDDLE_WHITESPACE = r"\s+(?:\\\s*\r?\n\s*)?"
 REPLACEMENT_CHARACTER = "_"  # character used in variable name replacements
 
 
@@ -10,14 +11,21 @@ def pre_format_str(src_contents):
     src_contents = src_contents.lstrip()
 
     vyper_types_names = re.findall(
-        rf"^(?:[^\S\r\n]*)(?P<vyper_type>{'|'.join(VYPER_CLASS_TYPES.union(VYPER_EXPRESSION_TYPES))}){MIDDLE_WHITESPACE}(?P<name>\w+).*$",
+        rf"^(?:[^\S\r\n]*)"
+        fr"(?P<vyper_type>{'|'.join(VYPER_CLASS_TYPES.union(VYPER_EXPRESSION_TYPES))})"
+        fr"{MIDDLE_WHITESPACE}(?P<name>\w+).*$",
         src_contents,
         flags=re.M,
     )
+    # FIXME
     # assert len(vyper_types_names) == len(pre_parse(src_contents)[0])
-    
+
     REGEX_SUBSTITUTE_VYPER_TYPES = re.compile(
-        fr"^(?P<leading_whitespace>[^\S\r\n]*)(?P<vyper_type>{'|'.join(VYPER_CLASS_TYPES.union(VYPER_EXPRESSION_TYPES))})(?P<middle_whitespace>{MIDDLE_WHITESPACE})(?P<name>\w+)(?P<trailing_characters>.*)$",
+        fr"^(?P<leading_whitespace>[^\S\r\n]*)"
+        fr"(?P<vyper_type>{'|'.join(VYPER_CLASS_TYPES.union(VYPER_EXPRESSION_TYPES))})"
+        fr"(?P<middle_whitespace>{MIDDLE_WHITESPACE})"
+        fr"(?P<name>\w+)"
+        fr"(?P<trailing_characters>.*)$",
         flags=re.M,
     )
 
@@ -41,9 +49,14 @@ def pre_format_str(src_contents):
         replacement_name = REPLACEMENT_CHARACTER * replacement_name_length
 
         # TODO: can fail if `vyper_name` is too short
-        # assert ( len(vyper_type) + len(vyper_name) == len(replacement_type) + len(replacement_name)))
+        # (when using `log` with a variable of less than 3 characters length)
+        # assert ( len(vyper_type) + len(vyper_name) == \
+        #   len(replacement_type) + len(replacement_name)))
         def _replacement_function(match):
-            return f"{match.group('leading_whitespace')}{replacement_type}{match.group('middle_whitespace')}{replacement_name}{match.group('trailing_characters')}"
+            return f"{match.group('leading_whitespace')}"
+            f"{replacement_type}"
+            f"{match.group('middle_whitespace')}"
+            f"{replacement_name}{match.group('trailing_characters')}"
 
         # Substitute the original string
         src_contents = REGEX_SUBSTITUTE_VYPER_TYPES.sub(
@@ -54,18 +67,26 @@ def pre_format_str(src_contents):
 
 
 def post_format_str(
-    vyper_types_names, dst_contents,
+    vyper_types_names,
+    dst_contents,
 ):
     # ?P<name> saves the group under match.group("$name")
     REGEX_EXTRACT_VYPER_NAMES = re.compile(
-        fr"^(?P<leading_whitespace>[^\S\r\n]*)(?:class|yield)(?P<middle_whitespace>{MIDDLE_WHITESPACE})(?P<name>{REPLACEMENT_CHARACTER}+)(?P<trailing_characters>.*)$",
+        fr"^(?P<leading_whitespace>[^\S\r\n]*)(?:class|yield)"
+        fr"(?P<middle_whitespace>{MIDDLE_WHITESPACE})"
+        fr"(?P<name>{REPLACEMENT_CHARACTER}+)"
+        fr"(?P<trailing_characters>.*)$",
         flags=re.MULTILINE,
     )
 
     for vyper_type, var_name in vyper_types_names:
 
         def _replacement_function(match):
-            return f"{match.group('leading_whitespace')}{vyper_type}{match.group('middle_whitespace')}{var_name}{match.group('trailing_characters')}"
+            return f"{match.group('leading_whitespace')}"
+            f"{vyper_type}"
+            f"{match.group('middle_whitespace')}"
+            f"{var_name}"
+            f"{match.group('trailing_characters')}"
 
         dst_contents = REGEX_EXTRACT_VYPER_NAMES.sub(
             _replacement_function, string=dst_contents, count=1
