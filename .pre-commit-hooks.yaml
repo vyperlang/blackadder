@@ -4,5 +4,5 @@
     files: \.(vy)$
     language: python
     language_version: python3
-    args: --fast
+    args: [--fast]
     require_serial: true

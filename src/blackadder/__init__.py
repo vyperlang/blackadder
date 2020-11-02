@@ -5,6 +5,9 @@ from blackadder.vyper_compat import pre_format_str, post_format_str
 
 def format_str_override(src_contents: str, **kwargs) -> FileContent:
     vyper_types_names, src_contents = pre_format_str(src_contents)
+    import ipdb
+
+    ipdb.set_trace()
     dst_contents = black_format_str(src_contents=src_contents, **kwargs)
     dst_contents = post_format_str(vyper_types_names, dst_contents)
     return dst_contents

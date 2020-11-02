@@ -53,10 +53,12 @@ def pre_format_str(src_contents):
         # assert ( len(vyper_type) + len(vyper_name) == \
         #   len(replacement_type) + len(replacement_name)))
         def _replacement_function(match):
-            return f"{match.group('leading_whitespace')}"
-            f"{replacement_type}"
-            f"{match.group('middle_whitespace')}"
-            f"{replacement_name}{match.group('trailing_characters')}"
+            return (
+                f"{match.group('leading_whitespace')}"
+                f"{replacement_type}"
+                f"{match.group('middle_whitespace')}"
+                f"{replacement_name}{match.group('trailing_characters')}"
+            )
 
         # Substitute the original string
         src_contents = REGEX_SUBSTITUTE_VYPER_TYPES.sub(
@@ -82,11 +84,13 @@ def post_format_str(
     for vyper_type, var_name in vyper_types_names:
 
         def _replacement_function(match):
-            return f"{match.group('leading_whitespace')}"
-            f"{vyper_type}"
-            f"{match.group('middle_whitespace')}"
-            f"{var_name}"
-            f"{match.group('trailing_characters')}"
+            return (
+                f"{match.group('leading_whitespace')}"
+                f"{vyper_type}"
+                f"{match.group('middle_whitespace')}"
+                f"{var_name}"
+                f"{match.group('trailing_characters')}"
+            )
 
         dst_contents = REGEX_EXTRACT_VYPER_NAMES.sub(
             _replacement_function, string=dst_contents, count=1

@@ -1,9 +1,11 @@
+# FIXME: proper asserts, not just smoke tests
+
 import blackadder
 import black
 
 
 def test_vyper():
-    blackadder.reformat_one(
+    assert blackadder.reformat_one(
         black.Path("data/Vault.vy"),
         fast=True,
         write_back=black.WriteBack.NO,
@@ -13,7 +15,7 @@ def test_vyper():
 
 
 def test_vyper_stable():  # Same as above except fast = False
-    blackadder.reformat_one(
+    assert blackadder.reformat_one(
         black.Path("data/Vault.vy"),
         fast=False,
         write_back=black.WriteBack.NO,
