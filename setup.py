@@ -36,6 +36,7 @@ setup(
     python_requires=">=3.6",
     install_requires=["black>=20.8b1", "vyper>=0.2.7"],
     test_suite="tests",
+    tests_require=["pytest"],
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Environment :: Console",
