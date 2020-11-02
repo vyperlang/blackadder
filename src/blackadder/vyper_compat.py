@@ -1,15 +1,12 @@
 import re
-from vyper.ast.pre_parser import VYPER_CLASS_TYPES, VYPER_EXPRESSION_TYPES
+from vyper.ast.pre_parser import VYPER_CLASS_TYPES, VYPER_EXPRESSION_TYPES, pre_parse
 
-# FIXME: `\s` here should be `[^\S\r\n]`
 WHITESPACE_EXCEPT_LINEBREAK = r"[^\S\r\n]"
 # Whitespace plus optional (multiple) `\` followed by a line break
 MIDDLE_WHITESPACE = (
     rf"{WHITESPACE_EXCEPT_LINEBREAK}+"
     rf"(?:\\{WHITESPACE_EXCEPT_LINEBREAK}*\r?\n{WHITESPACE_EXCEPT_LINEBREAK}*)*"
 )
-# MIDDLE_WHITESPACE = r"\s+(?:\\\s*\r?\n\s*)?"
-
 REPLACEMENT_CHARACTER = "_"  # character used in variable name replacements
 
 VYPER_DEPRECATED_CLASS_TYPES = {"contract"}
@@ -22,12 +19,12 @@ def pre_format_str(src_contents):
     vyper_types_names = re.findall(
         rf"^(?:[^\S\r\n]*)"
         fr"(?P<vyper_type>{'|'.join(VYPER_CLASS_TYPES.union(VYPER_EXPRESSION_TYPES))})"
-        fr"{MIDDLE_WHITESPACE}(?P<name>\w+).*$",
+        fr"{MIDDLE_WHITESPACE}"
+        fr"(?P<name>\w+).*$",
         src_contents,
         flags=re.M,
     )
-    # FIXME
-    # assert len(vyper_types_names) == len(pre_parse(src_contents)[0])
+    assert len(vyper_types_names) == len(pre_parse(src_contents)[0])
 
     REGEX_SUBSTITUTE_VYPER_TYPES = re.compile(
         fr"^(?P<leading_whitespace>[^\S\r\n]*)"
@@ -66,7 +63,8 @@ def pre_format_str(src_contents):
                 f"{match.group('leading_whitespace')}"
                 f"{replacement_type}"
                 f"{match.group('middle_whitespace')}"
-                f"{replacement_name}{match.group('trailing_characters')}"
+                f"{replacement_name}"
+                f"{match.group('trailing_characters')}"
             )
 
         # Substitute the original string
