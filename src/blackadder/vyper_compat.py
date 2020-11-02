@@ -2,9 +2,18 @@ import re
 from vyper.ast.pre_parser import VYPER_CLASS_TYPES, VYPER_EXPRESSION_TYPES
 
 # FIXME: `\s` here should be `[^\S\r\n]`
-# Whitespace plus optional single `\` followed by a line break
-MIDDLE_WHITESPACE = r"\s+(?:\\\s*\r?\n\s*)?"
+WHITESPACE_EXCEPT_LINEBREAK = r"[^\S\r\n]"
+# Whitespace plus optional (multiple) `\` followed by a line break
+MIDDLE_WHITESPACE = (
+    rf"{WHITESPACE_EXCEPT_LINEBREAK}+"
+    rf"(?:\\{WHITESPACE_EXCEPT_LINEBREAK}*\r?\n{WHITESPACE_EXCEPT_LINEBREAK}*)*"
+)
+# MIDDLE_WHITESPACE = r"\s+(?:\\\s*\r?\n\s*)?"
+
 REPLACEMENT_CHARACTER = "_"  # character used in variable name replacements
+
+VYPER_DEPRECATED_CLASS_TYPES = {"contract"}
+VYPER_CLASS_TYPES |= VYPER_DEPRECATED_CLASS_TYPES
 
 
 def pre_format_str(src_contents):

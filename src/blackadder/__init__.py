@@ -16,5 +16,3 @@ import black  # noqa
 black.format_str = format_str_override
 
 from black import *  # noqa: F4, E4
-
-# `blackadder --fast ...` works
