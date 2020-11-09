@@ -1,7 +1,8 @@
-# Copyright (C) 2020 Łukasz Langa
+"""
+Parts of this file were taken from black (https://github.com/psf/black/)
+"""
 from setuptools import setup
 import sys
-import os
 
 assert sys.version_info >= (3, 6, 0), "black requires Python 3.6+"
 from pathlib import Path  # noqa E402
@@ -18,21 +19,12 @@ def get_long_description() -> str:
     )
 
 
-USE_MYPYC = False
-# To compile with mypyc, a mypyc checkout must be present on the PYTHONPATH
-if len(sys.argv) > 1 and sys.argv[1] == "--use-mypyc":
-    sys.argv.pop(1)
-    USE_MYPYC = True
-if os.getenv("BLACK_USE_MYPYC", None) == "1":
-    USE_MYPYC = True
-
 setup(
     name="blackadder",
     description="The uncompromising code formatter.",
     long_description=get_long_description(),
     long_description_content_type="text/markdown",
     packages=["blackadder"],
-    package_dir={"": "src"},
     python_requires=">=3.6",
     install_requires=["black>=20.8b1", "vyper>=0.2.7"],
     test_suite="tests",
