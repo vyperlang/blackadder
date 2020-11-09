@@ -21,6 +21,8 @@ def get_long_description() -> str:
 
 setup(
     name="blackadder",
+    use_scm_version=True,
+    setup_requires=["setuptools_scm"],
     description="The uncompromising code formatter.",
     long_description=get_long_description(),
     long_description_content_type="text/markdown",
