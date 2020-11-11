@@ -1,7 +1,12 @@
 name: Test
 
-on: [push, pull_request]
-
+on:
+  pull_request:
+  push:
+    branches:
+      - '*'
+    tags:
+      - v*
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -10,6 +15,9 @@ jobs:
       matrix:
         python-version: [3.6, 3.7, 3.8, 3.9]
         os: [ubuntu-latest, macOS-latest, windows-latest]
+    
+    env:
+      PUBLISH_TO_PYPI:  ${{ matrix.python-version == '3.9' && matrix.os == 'ubuntu-latest' && github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags') }}
 
     steps:
       - uses: actions/checkout@v2
@@ -28,3 +36,15 @@ jobs:
       - name: Unit tests
         run: |
           pytest -v
+
+      - name: Build wheels
+        if: env.PUBLISH_TO_PYPI == 'true'
+        run: pip install wheel && python setup.py sdist bdist_wheel
+
+      - name: Publish to PyPI
+        # publish only if commit is tagged and we are on master, on a single item of the matrix,
+        if: env.PUBLISH_TO_PYPI == 'true'
+        uses: pypa/gh-action-pypi-publish@master
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_PASSWORD }}
