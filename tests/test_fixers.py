@@ -1,8 +1,6 @@
 from pathlib import Path
 
-import black
 import difflib
-import itertools
 import pytest
 
 import blackadder
@@ -27,7 +25,6 @@ def test_apply_blackadder(test_case):
     # Fixer works as expected
     fixed = blackadder.format_str_override(
         unchanged,
-        mode=black.Mode(),
     )
     assert fixed == expected
 

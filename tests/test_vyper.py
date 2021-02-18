@@ -10,7 +10,6 @@ def test_vyper():
         src = f.read()
     assert blackadder.format_str_override(
         src,
-        mode=black.Mode(),
     )
 
 
@@ -20,6 +19,5 @@ def test_vyper_stable():  # Same as above except fast = False
         black.Path("data/Vault.vy"),
         fast=False,
         write_back=black.WriteBack.NO,
-        mode=black.Mode(),
         report=black.Report(check=True),
     )
