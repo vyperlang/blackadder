@@ -1,6 +1,6 @@
 -   id: blackadder
     name: blackadder
-    entry: blackadder
+    entry: src
     files: \.(vy)$
     language: python
     language_version: python3
