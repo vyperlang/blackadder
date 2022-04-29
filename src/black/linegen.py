@@ -15,7 +15,7 @@ from black.nodes import (
     is_one_sequence_between,
 )
 from black.nodes import is_name_token, is_lpar_token, is_rpar_token
-from black.nodes import is_walrus_assignment, is_yield, is_vararg, is_multiline_string
+from black.nodes import is_walrus_assignment, is_log, is_vararg, is_multiline_string
 from black.nodes import is_stub_suite, is_stub_body, is_atom_with_invisible_parens
 from black.nodes import wrap_in_parentheses
 from black.brackets import max_delimiter_priority_in_atom
@@ -181,10 +181,7 @@ class LineGenerator(Visitor[Line]):
 
     def visit_suite(self, node: Node) -> Iterator[Line]:
         """Visit a suite."""
-        if self.mode.is_pyi and is_stub_suite(node):
-            yield from self.visit(node.children[2])
-        else:
-            yield from self.visit_default(node)
+        yield from self.visit_default(node)
 
     def visit_simple_stmt(self, node: Node) -> Iterator[Line]:
         """Visit a statement without nested statements."""
@@ -196,17 +193,13 @@ class LineGenerator(Visitor[Line]):
 
         is_suite_like = node.parent and node.parent.type in STATEMENT
         if is_suite_like:
-            if self.mode.is_pyi and is_stub_body(node):
-                yield from self.visit_default(node)
-            else:
-                yield from self.line(+1)
-                yield from self.visit_default(node)
-                yield from self.line(-1)
+            yield from self.line(+1)
+            yield from self.visit_default(node)
+            yield from self.line(-1)
 
         else:
             if (
-                not self.mode.is_pyi
-                or not node.parent
+                not node.parent
                 or not is_stub_suite(node.parent)
             ):
                 yield from self.line()
@@ -356,7 +349,9 @@ class LineGenerator(Visitor[Line]):
         else:
             self.visit_except_clause = partial(v, keywords={"except"}, parens=Ø)
             self.visit_with_stmt = partial(v, keywords={"with"}, parens=Ø)
-        self.visit_classdef = partial(v, keywords={"class"}, parens=Ø)
+        self.visit_structdef = partial(v, keywords={"struct"}, parens=Ø)
+        self.visit_interfacedef = partial(v, keywords={"interface"}, parens=Ø)
+        self.visit_eventdef = partial(v, keywords={"event"}, parens=Ø)
         self.visit_expr_stmt = partial(v, keywords=Ø, parens=ASSIGNMENTS)
         self.visit_return_stmt = partial(v, keywords={"return"}, parens={"return"})
         self.visit_import_from = partial(v, keywords=Ø, parens={"import"})

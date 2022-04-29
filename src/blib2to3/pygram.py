@@ -47,7 +47,9 @@ class _python_symbols(Symbols):
     augassign: int
     break_stmt: int
     case_block: int
-    classdef: int
+    eventdef: int
+    interfacedef: int
+    structdef: int
     comp_for: int
     comp_if: int
     comp_iter: int
@@ -133,9 +135,9 @@ class _python_symbols(Symbols):
     while_stmt: int
     with_stmt: int
     xor_expr: int
-    yield_arg: int
-    yield_expr: int
-    yield_stmt: int
+    log_arg: int
+    log_expr: int
+    log_stmt: int
 
 
 class _pattern_symbols(Symbols):

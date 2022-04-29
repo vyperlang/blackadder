@@ -54,7 +54,9 @@ STATEMENT: Final = {
     syms.except_clause,
     syms.with_stmt,
     syms.funcdef,
-    syms.classdef,
+    syms.structdef,
+    syms.eventdef,
+    syms.interfacedef,
     syms.match_stmt,
     syms.case_block,
 }
@@ -336,7 +338,7 @@ def whitespace(leaf: Leaf, *, complex_subscript: bool) -> str:  # noqa: C901
         if not prevp or prevp.type == token.AT or prevp.type == token.DOT:
             return NO
 
-    elif p.type == syms.classdef:
+    elif p.type in [syms.structdef,syms.interfacedef, syms.eventdef]:
         if t == token.LPAR:
             return NO
 
@@ -657,12 +659,12 @@ def is_simple_decorator_expression(node: LN) -> bool:
     return False
 
 
-def is_yield(node: LN) -> bool:
+def is_log(node: LN) -> bool:
     """Return True if `node` holds a `yield` or `yield from` expression."""
-    if node.type == syms.yield_expr:
+    if node.type == syms.log_expr:
         return True
 
-    if is_name_token(node) and node.value == "yield":
+    if is_name_token(node) and node.value == "log":
         return True
 
     if node.type != syms.atom:
@@ -673,7 +675,7 @@ def is_yield(node: LN) -> bool:
 
     lpar, expr, rpar = node.children
     if lpar.type == token.LPAR and rpar.type == token.RPAR:
-        return is_yield(expr)
+        return is_log(expr)
 
     return False
 

@@ -14,7 +14,7 @@ eval_input: testlist NEWLINE* ENDMARKER
 
 decorator: '@' namedexpr_test NEWLINE
 decorators: decorator+
-decorated: decorators (classdef | funcdef | async_funcdef)
+decorated: decorators (compounddef | funcdef | async_funcdef)
 async_funcdef: ASYNC funcdef
 funcdef: 'def' NAME parameters ['->' test] ':' suite
 parameters: '(' [typedargslist] ')'
@@ -75,9 +75,9 @@ stmt: simple_stmt | compound_stmt
 simple_stmt: small_stmt (';' small_stmt)* [';'] NEWLINE
 small_stmt: (expr_stmt | print_stmt  | del_stmt | pass_stmt | flow_stmt |
              import_stmt | global_stmt | exec_stmt | assert_stmt)
-expr_stmt: testlist_star_expr (annassign | augassign (yield_expr|testlist) |
-                     ('=' (yield_expr|testlist_star_expr))*)
-annassign: ':' test ['=' (yield_expr|testlist_star_expr)]
+expr_stmt: testlist_star_expr (annassign | augassign (log_expr|testlist) |
+                     ('=' (log_expr|testlist_star_expr))*)
+annassign: ':' test ['=' (log_expr|testlist_star_expr)]
 testlist_star_expr: (test|star_expr) (',' (test|star_expr))* [',']
 augassign: ('+=' | '-=' | '*=' | '@=' | '/=' | '%=' | '&=' | '|=' | '^=' |
             '<<=' | '>>=' | '**=' | '//=')
@@ -86,11 +86,11 @@ print_stmt: 'print' ( [ test (',' test)* [','] ] |
                       '>>' test [ (',' test)+ [','] ] )
 del_stmt: 'del' exprlist
 pass_stmt: 'pass'
-flow_stmt: break_stmt | continue_stmt | return_stmt | raise_stmt | yield_stmt
+flow_stmt: break_stmt | continue_stmt | return_stmt | raise_stmt | log_stmt
 break_stmt: 'break'
 continue_stmt: 'continue'
 return_stmt: 'return' [testlist_star_expr]
-yield_stmt: yield_expr
+log_stmt: log_expr
 raise_stmt: 'raise' [test ['from' test | ',' test [',' test]]]
 import_stmt: import_name | import_from
 import_name: 'import' dotted_as_names
@@ -105,7 +105,7 @@ global_stmt: ('global' | 'nonlocal') NAME (',' NAME)*
 exec_stmt: 'exec' expr ['in' test [',' test]]
 assert_stmt: 'assert' test [',' test]
 
-compound_stmt: if_stmt | while_stmt | for_stmt | try_stmt | with_stmt | funcdef | classdef | decorated | async_stmt | match_stmt
+compound_stmt: if_stmt | while_stmt | for_stmt | try_stmt | with_stmt | funcdef | compounddef | decorated | async_stmt | match_stmt
 async_stmt: ASYNC (funcdef | with_stmt | for_stmt)
 if_stmt: 'if' namedexpr_test ':' suite ('elif' namedexpr_test ':' suite)* ['else' ':' suite]
 while_stmt: 'while' namedexpr_test ':' suite ['else' ':' suite]
@@ -154,7 +154,7 @@ arith_expr: term (('+'|'-') term)*
 term: factor (('*'|'@'|'/'|'%'|'//') factor)*
 factor: ('+'|'-'|'~') factor | power
 power: [AWAIT] atom trailer* ['**' factor]
-atom: ('(' [yield_expr|testlist_gexp] ')' |
+atom: ('(' [log_expr|testlist_gexp] ')' |
        '[' [listmaker] ']' |
        '{' [dictsetmaker] '}' |
        '`' testlist1 '`' |
@@ -173,7 +173,11 @@ dictsetmaker: ( ((test ':' asexpr_test | '**' expr)
                 ((test [':=' test] | star_expr)
 		 (comp_for | (',' (test [':=' test] | star_expr))* [','])) )
 
-classdef: 'class' NAME ['(' [arglist] ')'] ':' suite
+eventdef: 'event' NAME ['(' [arglist] ')'] ':' suite
+interfacedef: 'interface' NAME ['(' [arglist] ')'] ':' suite
+structdef: 'struct' NAME ['(' [arglist] ')'] ':' suite
+
+compounddef: eventdef | interfacedef | structdef
 
 arglist: argument (',' argument)* [',']
 
@@ -219,8 +223,8 @@ testlist1: test (',' test)*
 # not used in grammar, but may appear in "node" passed from Parser to Compiler
 encoding_decl: NAME
 
-yield_expr: 'yield' [yield_arg]
-yield_arg: 'from' test | testlist_star_expr
+log_expr: 'log' [log_arg]
+log_arg: 'from' test | testlist_star_expr
 
 
 # 3.10 match statement definition

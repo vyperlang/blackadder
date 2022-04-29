@@ -1658,7 +1658,7 @@ class StringParenWrapper(BaseStringSplitter, CustomSplitMapMixin):
         """
         # If this line is apart of a return/yield statement and the first leaf
         # contains either the "return" or "yield" keywords...
-        if parent_type(LL[0]) in [syms.return_stmt, syms.yield_expr] and LL[
+        if parent_type(LL[0]) in [syms.return_stmt, syms.log_expr] and LL[
             0
         ].value in ["return", "yield"]:
             is_valid_index = is_valid_index_factory(LL)
