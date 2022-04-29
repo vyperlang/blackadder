@@ -301,7 +301,7 @@ def load_packaged_grammar(
     """
     if os.path.isfile(grammar_source):
         gp = _generate_pickle_name(grammar_source, cache_dir) if cache_dir else None
-        return load_grammar(grammar_source, gp=gp)
+        return load_grammar(grammar_source, gp=gp, force=True)
     pickled_name = _generate_pickle_name(os.path.basename(grammar_source), cache_dir)
     data = pkgutil.get_data(package, pickled_name)
     assert data is not None
