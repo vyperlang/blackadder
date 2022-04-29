@@ -1,0 +1,5 @@
+.pytest_cache
+blackadder.egg-info
+*.pyc
+venv
+.eggs
