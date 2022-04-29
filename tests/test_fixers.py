@@ -1,13 +1,11 @@
 from pathlib import Path
 
-import black
 import difflib
 import itertools
 import pytest
 
-import blackadder
+from src import black
 import vyper
-
 
 DATA_DIR = Path(__file__).parent / "data"
 # NOTE: Do this so pytest creates pretty test names
@@ -25,7 +23,7 @@ def test_apply_blackadder(test_case):
     expected = "\n".join(difflib.restore(lines, 2))  # Lines starting with '+'
 
     # Fixer works as expected
-    fixed = blackadder.format_str_override(
+    fixed = black.format_str(
         unchanged,
         mode=black.Mode(),
     )
