@@ -118,6 +118,15 @@ class Line:
         )
 
     @property
+    def is_interface(self) -> bool:
+        """Is this line a interface definition?"""
+        return (
+            bool(self)
+            and self.leaves[0].type == token.NAME
+            and self.leaves[0].value == "interface"
+        )
+
+    @property
     def is_stub_class(self) -> bool:
         """Is this line a class definition with a body consisting only of "..."?"""
         return self.is_class and self.leaves[-3:] == [
@@ -275,11 +284,11 @@ class Line:
                 and closing.parent.type == syms.trailer
                 and closing.opening_bracket
                 and is_one_sequence_between(
-                    closing.opening_bracket,
-                    closing,
-                    self.leaves,
-                    brackets=(token.LSQB, token.RSQB),
-                )
+                closing.opening_bracket,
+                closing,
+                self.leaves,
+                brackets=(token.LSQB, token.RSQB),
+            )
             ):
                 return False
 
@@ -429,7 +438,8 @@ class EmptyLineTracker:
     is_pyi: bool = False
     previous_line: Optional[Line] = None
     previous_after: int = 0
-    previous_defs: List[int] = field(default_factory=list)
+    # (type, depth)
+    previous_defs: List[Tuple[int, int]] = field(default_factory=list)
 
     def maybe_empty_lines(self, current_line: Line) -> Tuple[int, int]:
         """Return the number of extra empty lines before and after the `current_line`.
@@ -462,7 +472,7 @@ class EmptyLineTracker:
         else:
             before = 0
         depth = current_line.depth
-        while self.previous_defs and self.previous_defs[-1] >= depth:
+        while self.previous_defs and self.previous_defs[-1][1] >= depth:
             if self.is_pyi:
                 assert self.previous_line is not None
                 if depth and not current_line.is_def and self.previous_line.is_def:
@@ -496,7 +506,7 @@ class EmptyLineTracker:
                     before = 2
             self.previous_defs.pop()
         if current_line.is_decorator or current_line.is_def or current_line.is_class:
-            return self._maybe_empty_lines_for_class_or_def(current_line, before)
+            return self._maybe_empty_lines_for_class_or_def_or_interface(current_line, before)
 
         if (
             self.previous_line
@@ -515,11 +525,24 @@ class EmptyLineTracker:
 
         return before, 0
 
-    def _maybe_empty_lines_for_class_or_def(
+    def _type_of_line(self, line: Line):
+        if line.is_def:
+            return syms.funcdef
+        elif line.is_interface:
+            return syms.interfacedef
+        else:
+            return -1
+
+    def _maybe_empty_lines_for_class_or_def_or_interface(
         self, current_line: Line, before: int
     ) -> Tuple[int, int]:
+        parent_is_interface = self.previous_defs and self.previous_defs[-1][0] == syms.interfacedef
         if not current_line.is_decorator:
-            self.previous_defs.append(current_line.depth)
+            self.previous_defs.append((self._type_of_line(current_line), current_line.depth))
+
+        if parent_is_interface:
+            return 0, 0
+
         if self.previous_line is None:
             # Don't insert empty lines before the first line in the file.
             return 0, 0
@@ -701,12 +724,12 @@ def can_omit_invisible_parens(
         last.type == token.RPAR
         or last.type == token.RBRACE
         or (
-            # don't use indexing for omitting optional parentheses;
-            # it looks weird
-            last.type == token.RSQB
-            and last.parent
-            and last.parent.type != syms.trailer
-        )
+        # don't use indexing for omitting optional parentheses;
+        # it looks weird
+        last.type == token.RSQB
+        and last.parent
+        and last.parent.type != syms.trailer
+    )
     ):
         if penultimate.type in OPENING_BRACKETS:
             # Empty brackets don't help.

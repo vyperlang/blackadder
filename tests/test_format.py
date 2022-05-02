@@ -11,7 +11,8 @@ PROJECT_ROOT = THIS_DIR.parent
 EMPTY_LINE = "# EMPTY LINE WITH WHITESPACE" + " (this comment will be removed)"
 
 SIMPLE_CASES: List[str] = [
-    "Vault.vy"
+    "Vault.vy",
+    "Interface.vy"
 ]
 
 DEFAULT_MODE = Mode()

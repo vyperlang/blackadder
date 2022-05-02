@@ -191,8 +191,16 @@ class LineGenerator(Visitor[Line]):
                 wrap_in_parentheses(node, child, visible=False)
             prev_type = child.type
 
+        is_interface_funcdef = node.parent and node.parent.type == syms.funcdef \
+            and node.parent.parent and node.parent.parent.type == syms.suite \
+            and node.parent.parent.parent and node.parent.parent.parent.type == syms.interfacedef
+
         is_suite_like = node.parent and node.parent.type in STATEMENT
-        if is_suite_like:
+
+        if is_interface_funcdef:
+            yield from self.visit_default(node)
+
+        elif is_suite_like:
             yield from self.line(+1)
             yield from self.visit_default(node)
             yield from self.line(-1)

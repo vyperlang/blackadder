@@ -115,6 +115,7 @@ class _python_symbols(Symbols):
     subscript: int
     subscriptlist: int
     suite: int
+    interface_suite: int
     term: int
     test: int
     testlist: int

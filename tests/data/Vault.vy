@@ -866,29 +866,15 @@ from vyper.interfaces import ERC20
 implements: ERC20
 
 interface DetailedERC20:
-
-    def name() -> String[42]:
-        view
-
-    def symbol() -> String[20]:
-        view
-
-    def decimals() -> uint256:
-        view
+    def name() -> String[42]: view
+    def symbol() -> String[20]: view
+    def decimals() -> uint256: view
 
 interface Strategy:
-
-    def strategist() -> address:
-        view
-
-    def estimatedTotalAssets() -> uint256:
-        view
-
-    def withdraw(_amount: uint256):
-        nonpayable
-
-    def migrate(_newStrategy: address):
-        nonpayable
+    def strategist() -> address: view
+    def estimatedTotalAssets() -> uint256: view
+    def withdraw(_amount: uint256): nonpayable
+    def migrate(_newStrategy: address): nonpayable
 
 event Transfer:
     sender: indexed(address)
